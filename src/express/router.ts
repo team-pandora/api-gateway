@@ -3,21 +3,20 @@ import { StatusCodes } from 'http-status-codes';
 import { ServerError } from './error';
 import fsRouter from './fs/router';
 import quotasRouter from './quotas/router';
-import shragaRouter from './shraga/router';
+// import shragaRouter from './shraga/router';
 import transfersRouter from './transfers/router';
-import usersRouter from './users/router';
+import configRouter from './config/router';
 
 const appRouter = Router();
 
-appRouter.use('/auth', shragaRouter);
+// appRouter.use('/auth', shragaRouter);
 
-// TODO: check this
-// appRouter.use('/api/config', configRouter);
-
+appRouter.use('/api/config', configRouter);
+appRouter.use('api/router', transfersRouter);
 appRouter.use('/api/fs', fsRouter);
 appRouter.use('/api/quotas', quotasRouter);
 appRouter.use('/api/transfers', transfersRouter);
-appRouter.use('/api/users', usersRouter);
+// appRouter.use('/api/users', usersRouter);
 
 appRouter.use('/isAlive', (_req, res) => {
     res.status(StatusCodes.OK).send('alive');
