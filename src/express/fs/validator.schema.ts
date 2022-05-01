@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import * as Joi from 'joi';
 import config from '../../config';
 import { JoiObjectId } from '../../utils/joi';
 
