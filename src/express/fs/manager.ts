@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from '../../config';
-import { IFsGetReq, INewFsObject } from './interface';
+import { IFsGetReq, INewFsObject, IFsGetShareLink } from './interface';
 
 export const getFsObject = async (filters: IFsGetReq) => {
     return (await axios.get(`${config.service.fsServiceUrl}/fs`, { params: filters })).data;
@@ -33,6 +33,22 @@ export const deleteFsObject = async (id: string) => {
 
 export const shareFsObject = async (fsObjectId: string, userId: string, permission: string) => {
     // If user
-    return (await axios.post(`${config.service.fsServiceUrl}/users/${userId}/fs/${fsObjectId}/share`, { permission }))
+    return (
+        await axios.post(`${config.service.fsServiceUrl}/fs/users/${userId}/fs/${fsObjectId}/share`, { permission })
+    ).data;
+};
+
+export const copyFsObject = async (fsObjectId: string, destination: string, folderId: string, name: string) => {
+    // If user
+    return (await axios.post(`${config.service.fsServiceUrl}/fs/${fsObjectId}/copy`, { destination, folderId, name }))
         .data;
+};
+
+export const getFsObjectShareLink = async (fsObjectId: string, filter: IFsGetShareLink) => {
+    // If user
+    return (await axios.get(`${config.service.fsServiceUrl}/fs/${fsObjectId}/share/link`, { params: { filter } })).data;
+};
+
+export const removePermissions = async (fsObjectId: string, userIds: string[]) => {
+    return (await axios.delete(`${config.service.fsServiceUrl}/fs/${fsObjectId}/hierarchy`, { data: userIds })).data;
 };

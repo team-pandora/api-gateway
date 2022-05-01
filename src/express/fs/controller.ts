@@ -33,3 +33,17 @@ export const deleteFsObject = async (req: Request, res: Response) => {
 export const shareFsObject = async (req: Request, res: Response) => {
     res.json(await fsManager.shareFsObject(req.params.fsObjectId, req.body.userId, req.body.permission));
 };
+
+export const copyFsObject = async (req: Request, res: Response) => {
+    res.json(
+        await fsManager.copyFsObject(req.params.fsObjectId, req.body.destination, req.body.folderId, req.body.name),
+    );
+};
+
+export const getFsObjectShareLink = async (req: Request, res: Response) => {
+    res.json(await fsManager.getFsObjectShareLink(req.params.fsObjectId, req.query));
+};
+
+export const removePermissions = async (req: Request, res: Response) => {
+    res.json(await fsManager.removePermissions(req.params.fsObjectId, req.body.userIds));
+};

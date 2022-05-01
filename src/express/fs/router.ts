@@ -4,50 +4,68 @@ import * as ValidatorSchemas from './validator.schema';
 import * as fsController from './controller';
 import { wrapController } from '../../utils/express';
 
-const fs: Router = Router();
+const fsRouter: Router = Router();
 
-fs.get('/', ValidateRequest(ValidatorSchemas.getFsObjectRequestSchema), wrapController(fsController.getFsObject));
+fsRouter.get('/', ValidateRequest(ValidatorSchemas.getFsObjectRequestSchema), wrapController(fsController.getFsObject));
 
-fs.get(
+fsRouter.get(
     '/:fsObjectId',
     ValidateRequest(ValidatorSchemas.getFsObjectByIdRequestSchema),
     wrapController(fsController.getFsObjectById),
 );
 
-fs.get(
+fsRouter.get(
     '/:fsObjectId/hierarchy',
     ValidateRequest(ValidatorSchemas.getFsObjectHierarchyRequestSchema),
     wrapController(fsController.getFsObjectHierarchy),
 );
 
-fs.get(
+fsRouter.get(
     '/search',
     ValidateRequest(ValidatorSchemas.getFsObjectRequestSchema),
     wrapController(fsController.searchFsObject),
 );
 
-fs.patch(
+fsRouter.patch(
     '/:fsObjectId',
     ValidateRequest(ValidatorSchemas.updateFsObjectRequestSchema),
     wrapController(fsController.updateFsObject),
 );
 
-fs.patch(
+fsRouter.patch(
     '/move',
     ValidateRequest(ValidatorSchemas.moveFsObjectsRequestSchema),
     wrapController(fsController.moveFsObject),
 );
 
-fs.delete(
+fsRouter.delete(
     '/:fsObjectId',
     ValidateRequest(ValidatorSchemas.deleteFsObjectRequestSchema),
     wrapController(fsController.deleteFsObject),
 );
 
-fs.post(
+fsRouter.post(
     '/:fsObjectId/share',
     ValidateRequest(ValidatorSchemas.shareFsObjectRequestSchema),
     wrapController(fsController.shareFsObject),
 );
 
-export default fs;
+fsRouter.post(
+    '/:fsObjectId/copy',
+    ValidateRequest(ValidatorSchemas.copyFsObjectRequestSchema),
+    wrapController(fsController.copyFsObject),
+);
+
+fsRouter.get(
+    '/:fsObjectId/share/link',
+    ValidateRequest(ValidatorSchemas.getFsObjectShareLinkRequestSchema),
+    wrapController(fsController.getFsObjectShareLink),
+);
+
+fsRouter.delete(
+    '/:fsObjectId/permissions',
+    ValidateRequest(ValidatorSchemas.removePermissionsRequestSchema),
+    wrapController(fsController.removePermissions),
+);
+
+export default fsRouter;

@@ -1,4 +1,4 @@
-import Joi = require('joi');
+import Joi from 'joi';
 import config from '../../config';
 import { JoiObjectId } from '../../utils/joi';
 
@@ -126,5 +126,39 @@ export const shareFsObjectRequestSchema = Joi.object({
         permission: Joi.string()
             .valid(...permissions)
             .required(),
+    },
+});
+
+export const copyFsObjectRequestSchema = Joi.object({
+    query: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {
+        name: Joi.string().regex(nameRegex).required(),
+        folderId: JoiObjectId.required(),
+    },
+});
+
+export const getFsObjectShareLinkRequestSchema = Joi.object({
+    query: {
+        permission: Joi.string()
+            .valid(...permissions)
+            .required(),
+        time: Joi.number().integer().min(1).required(),
+    },
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {},
+});
+
+export const removePermissionsRequestSchema = Joi.object({
+    query: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {
+        userIds: Joi.array().items(JoiObjectId).min(1).required(),
     },
 });
