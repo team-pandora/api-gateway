@@ -141,16 +141,16 @@ export const copyFsObjectRequestSchema = Joi.object({
 });
 
 export const getFsObjectShareLinkRequestSchema = Joi.object({
-    query: {
-        permission: Joi.string()
-            .valid(...permissions)
-            .required(),
-        time: Joi.number().integer().min(1).required(),
-    },
+    query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
     },
-    body: {},
+    body: {
+        permission: Joi.string()
+            .valid(...permissions)
+            .optional(),
+        time: Joi.date().required(),
+    },
 });
 
 export const removePermissionsRequestSchema = Joi.object({

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import * as jwt from 'jsonwebtoken';
 import config from '../../config';
-import { IFsGetReq, INewFsObject, IFsGetShareLink } from './interface';
+import { IFsGetReq, INewFsObject } from './interface';
 
 export const getFsObject = async (filters: IFsGetReq) => {
     return (await axios.get(`${config.service.fsServiceUrl}/fs`, { params: filters })).data;
@@ -44,9 +45,8 @@ export const copyFsObject = async (fsObjectId: string, destination: string, fold
         .data;
 };
 
-export const getFsObjectShareLink = async (fsObjectId: string, filter: IFsGetShareLink) => {
-    // If user
-    return (await axios.get(`${config.service.fsServiceUrl}/fs/${fsObjectId}/share/link`, { params: { filter } })).data;
+export const getFsObjectShareLink = async (fsObjectId: string, permission: string, time: Date) => {
+    return jwt.sign({ fsObjectId, permission, time }, 'tempsecret', { algorithm: 'HS256' });
 };
 
 export const removePermissions = async (fsObjectId: string, userIds: string[]) => {

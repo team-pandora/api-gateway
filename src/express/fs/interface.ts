@@ -19,9 +19,4 @@ export type IFsGetReq = Partial<IFsObject> & {
     pageSize?: number;
 };
 
-export type IFsGetShareLink = {
-    permission?: string;
-    time?: string;
-};
-
 export type INewFsObject = Omit<IFsObject, '_id' | 'createdAt'>;

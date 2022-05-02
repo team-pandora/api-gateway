@@ -41,7 +41,7 @@ export const copyFsObject = async (req: Request, res: Response) => {
 };
 
 export const getFsObjectShareLink = async (req: Request, res: Response) => {
-    res.json(await fsManager.getFsObjectShareLink(req.params.fsObjectId, req.query));
+    res.json(await fsManager.getFsObjectShareLink(req.params.fsObjectId, req.body.permission, req.body.time));
 };
 
 export const removePermissions = async (req: Request, res: Response) => {
