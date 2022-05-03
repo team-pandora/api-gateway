@@ -3,6 +3,6 @@ import { IGetRequest } from './interface';
 
 // TODO
 export const getUsers = async (_query: IGetRequest) => {
-    // return await axios.get('http://file-service:8000')
+    // return axios.get('http://file-service:8000')
     return '';
 };

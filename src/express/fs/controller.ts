@@ -31,7 +31,14 @@ export const deleteFsObject = async (req: Request, res: Response) => {
 };
 
 export const shareFsObject = async (req: Request, res: Response) => {
-    res.json(await fsManager.shareFsObject(req.params.fsObjectId, req.body.userId, req.body.permission));
+    res.json(
+        await fsManager.shareFsObject(
+            req.params.fsObjectId,
+            req.body.ownerId,
+            req.body.recipientId,
+            req.body.permission,
+        ),
+    );
 };
 
 export const copyFsObject = async (req: Request, res: Response) => {
@@ -40,8 +47,21 @@ export const copyFsObject = async (req: Request, res: Response) => {
     );
 };
 
-export const getFsObjectShareLink = async (req: Request, res: Response) => {
-    res.json(await fsManager.getFsObjectShareLink(req.params.fsObjectId, req.body.permission, req.body.time));
+export const createFsObjectShareLink = async (req: Request, res: Response) => {
+    // todo: shraga
+    res.json(
+        await fsManager.createFsObjectShareLink(
+            req.params.fsObjectId,
+            req.body.ownerId,
+            req.body.permission,
+            req.body.time,
+        ),
+    );
+};
+
+export const receiveFsObjectShareLink = async (req: Request, res: Response) => {
+    // todo: shraga
+    res.json(await fsManager.receiveFsObjectShareLink(req.params.token, 'shragaId'));
 };
 
 export const removePermissions = async (req: Request, res: Response) => {

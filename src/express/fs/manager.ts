@@ -32,10 +32,13 @@ export const deleteFsObject = async (id: string) => {
     return (await axios.delete(`${config.service.fsServiceUrl}/fs/${id}`)).data;
 };
 
-export const shareFsObject = async (fsObjectId: string, userId: string, permission: string) => {
+export const shareFsObject = async (fsObjectId: string, ownerId: string, recipientId: string, permission: string) => {
     // If user
     return (
-        await axios.post(`${config.service.fsServiceUrl}/fs/users/${userId}/fs/${fsObjectId}/share`, { permission })
+        await axios.post(`${config.service.fsServiceUrl}/fs/users/${ownerId}/fs/${fsObjectId}/share`, {
+            permission,
+            recipientId,
+        })
     ).data;
 };
 
@@ -45,10 +48,20 @@ export const copyFsObject = async (fsObjectId: string, destination: string, fold
         .data;
 };
 
-export const getFsObjectShareLink = async (fsObjectId: string, permission: string, time: Date) => {
-    return jwt.sign({ fsObjectId, permission, time }, 'tempsecret', { algorithm: 'HS256' });
-};
-
 export const removePermissions = async (fsObjectId: string, userIds: string[]) => {
     return (await axios.delete(`${config.service.fsServiceUrl}/fs/${fsObjectId}/hierarchy`, { data: userIds })).data;
+};
+
+export const createFsObjectShareLink = async (fsObjectId: string, ownerId: string, permission: string, time: Date) => {
+    return jwt.sign({ fsObjectId, ownerId, permission, time }, 'tempsecret', { algorithm: 'HS256' });
+};
+
+export const receiveFsObjectShareLink = async (token: string, recipientId: string) => {
+    const payload = jwt.verify(token, 'tempsecret');
+
+    if (typeof payload !== 'object' || !payload.iat) {
+        throw new Error('Invalid JWT payload');
+    }
+
+    return shareFsObject(payload.fsObjectId, payload.ownerId, recipientId, payload.permission);
 };

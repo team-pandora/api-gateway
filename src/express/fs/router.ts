@@ -56,10 +56,16 @@ fsRouter.post(
     wrapController(fsController.copyFsObject),
 );
 
-fsRouter.get(
+fsRouter.post(
     '/:fsObjectId/share/link',
-    ValidateRequest(ValidatorSchemas.getFsObjectShareLinkRequestSchema),
-    wrapController(fsController.getFsObjectShareLink),
+    ValidateRequest(ValidatorSchemas.createFsObjectShareLinkRequestSchema),
+    wrapController(fsController.createFsObjectShareLink),
+);
+
+fsRouter.post(
+    '/share/receive/:token',
+    ValidateRequest(ValidatorSchemas.receiveFsObjectShareLinkRequestSchema),
+    wrapController(fsController.receiveFsObjectShareLink),
 );
 
 fsRouter.delete(

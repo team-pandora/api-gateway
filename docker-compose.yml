@@ -5,5 +5,7 @@ services:
     build: .
     environment:
       PORT: 8000
+      FILE_SERVICE_URL: "http://file-service:8000/api"
+      TRANSFER_SERVICE_URL: "http://transfer-service:8000/api"
     ports:
       - 8000:8000

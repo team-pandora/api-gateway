@@ -140,17 +140,26 @@ export const copyFsObjectRequestSchema = Joi.object({
     },
 });
 
-export const getFsObjectShareLinkRequestSchema = Joi.object({
+export const createFsObjectShareLinkRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
     },
     body: {
+        ownerId: JoiObjectId.required(),
         permission: Joi.string()
             .valid(...permissions)
             .optional(),
         time: Joi.date().required(),
     },
+});
+
+export const receiveFsObjectShareLinkRequestSchema = Joi.object({
+    query: {},
+    params: {
+        token: Joi.string().required(),
+    },
+    body: {},
 });
 
 export const removePermissionsRequestSchema = Joi.object({
