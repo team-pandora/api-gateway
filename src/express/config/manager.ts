@@ -1,5 +1,3 @@
-import config from "../../config"
-
-export const getConfig = async() => {
-    return config.placeholder
-}
+export const getConfig = async () => {
+    return {};
+};

@@ -1,8 +1,14 @@
 import { Request } from 'express';
 import * as Joi from 'joi';
-import { wrapValidator } from './express';
+import * as mongoose from 'mongoose';
+import wrapMiddleware from './express';
 
-export const JoiObjectId = Joi.string().hex().length(24);
+export const JoiMongoObjectId = Joi.string().hex().length(24);
+
+export const JoiObjectId = Joi.string()
+    .hex()
+    .length(24)
+    .custom((value) => new mongoose.Types.ObjectId(value));
 
 const defaultValidationOptions: Joi.ValidationOptions = {
     abortEarly: false,
@@ -33,7 +39,7 @@ const ValidateRequest = (schema: Joi.ObjectSchema<any>, options: Joi.ValidationO
         }
     };
 
-    return wrapValidator(validator);
+    return wrapMiddleware(validator);
 };
 
 export default ValidateRequest;
