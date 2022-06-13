@@ -1,14 +1,8 @@
 import { Request } from 'express';
 import * as Joi from 'joi';
-import * as mongoose from 'mongoose';
 import wrapMiddleware from './express';
 
-export const JoiMongoObjectId = Joi.string().hex().length(24);
-
-export const JoiObjectId = Joi.string()
-    .hex()
-    .length(24)
-    .custom((value) => new mongoose.Types.ObjectId(value));
+export const JoiObjectId = Joi.string().hex().length(24);
 
 const defaultValidationOptions: Joi.ValidationOptions = {
     abortEarly: false,

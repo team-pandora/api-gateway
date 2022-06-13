@@ -23,6 +23,9 @@ const config = {
     //     maxLimitAllowedInBytes: env.get('QUOTA_MAX_LIMIT_ALLOWED_IN_BYTES').default('107374182400').asInt(),
     //     minLimitAllowedInBytes: env.get('QUOTA_MIN_LIMIT_ALLOWED_IN_BYTES').default('0').asInt(),
     // },
+    validations: {
+        userIdRegex: env.get('USER_ID_REGEX').default('^[a-zA-Z0-9s._@-]{1,100}$').asRegExp(),
+    },
     constants: {
         fsObjectTypes: ['file', 'folder', 'shortcut'] as const,
         apps: ['dropbox', 'drive', 'falcon'] as const,
