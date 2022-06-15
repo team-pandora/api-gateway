@@ -3,11 +3,17 @@ import config from '../../config';
 
 const { permissions, fsObjectTypes, statesSortFields, fsObjectsSortFields, sortOrders } = config.constants;
 
-type permission = typeof permissions[number];
+export type permission = typeof permissions[number];
 type fsObjectType = typeof fsObjectTypes[number];
 type fsObjectsSortField = typeof fsObjectsSortFields[number];
 type statesSortField = typeof statesSortFields[number];
 type sortOrder = typeof sortOrders[number];
+
+export interface INewFile {
+    name: string;
+    size: number;
+    public?: boolean;
+}
 
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters
