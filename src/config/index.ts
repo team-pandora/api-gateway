@@ -28,6 +28,7 @@ const config = {
         statesSortFields: ['stateCreatedAt', 'stateUpdatedAt'] as const,
         fsObjectsSortFields: ['size', 'public', 'name', 'type', 'fsObjectCreatedAt', 'fsObjectUpdatedAt'] as const,
         sortOrders: ['asc', 'desc'] as const,
+        jwtSecret: env.get('JWT_SECRET').required().asString(),
     },
     spike: {
         enabled: env.get('SPIKE_ENABLED').required().asBool(),

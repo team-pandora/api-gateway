@@ -1,23 +1,7 @@
-import * as mongoose from 'mongoose';
+import { ObjectId } from 'mongoose';
 import config from '../../config';
 
 export type fsObjectType = typeof config.constants.fsObjectTypes[number];
-
-export interface IFsObject {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    parent: mongoose.Types.ObjectId | null;
-    createdAt: Date;
-    updatedAt: Date;
-    type: fsObjectType;
-}
-
-export type IFsGetReq = Partial<IFsObject> & {
-    sortBy?: string;
-    sortOrder?: string;
-    page?: number;
-    pageSize?: number;
-};
 
 export type IUserGetReq = {
     userId?: string;
@@ -26,4 +10,20 @@ export type IUserGetReq = {
     source?: string;
 };
 
-export type INewFsObject = Omit<IFsObject, '_id' | 'createdAt'>;
+export type INewFile = {
+    name?: string;
+    parent?: ObjectId;
+    public?: boolean;
+    size?: number;
+};
+
+export type IUpdateFsObject = {
+    name: string;
+    parent: ObjectId;
+    public: boolean;
+};
+
+export type IGenerateLink = {
+    time: string;
+    permission: string;
+};

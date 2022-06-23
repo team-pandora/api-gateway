@@ -1,6 +1,11 @@
 import { NextFunction, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { shragaCallbackMiddleware, shragaLoginMiddleware, spikeAuthMiddlewareFactory as spike } from './auth';
+import {
+    shragaAuthMiddleware as shraga,
+    shragaCallbackMiddleware,
+    shragaLoginMiddleware,
+    spikeAuthMiddlewareFactory as spike,
+} from './auth';
 import clientsRouter from './clients/router';
 import { ServerError } from './error';
 import usersRouter from './users/router';
@@ -15,7 +20,7 @@ appRouter.get('/config', (_, res: Response, next: NextFunction) => {
     next();
 });
 
-appRouter.use('/api/users', usersRouter);
+appRouter.use('/api/users', shraga, usersRouter);
 
 appRouter.use('/api/clients', spike(['api']), clientsRouter);
 

@@ -14,7 +14,7 @@ export const fsServiceErrorHandler =
             throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, `${messagePrefix}, internal error`, error);
         }
 
-        const { status, message } = error.response.data;
+        const { code, message } = error.response.data;
 
         if (cleanupFunc) {
             await cleanupFunc().catch((err) => {
@@ -22,7 +22,7 @@ export const fsServiceErrorHandler =
             });
         }
 
-        throw new ServerError(status, `${messagePrefix}, ${message}`, error);
+        throw new ServerError(code, `${messagePrefix}, ${message}`, error);
     };
 
 export const storageService = axios.create({
