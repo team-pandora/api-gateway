@@ -89,7 +89,7 @@ export const downloadFsObjectRequestSchema = Joi.object({
     body: {},
 });
 
-export const searchFsObjectRequestSchema = Joi.object({
+export const searchFsObjectsRequestSchema = Joi.object({
     query: {
         query: Joi.string().required(),
     },
@@ -102,7 +102,7 @@ export const shareFsObjectRequestSchema = Joi.object({
     params: {},
     body: {
         userId: Joi.string().regex(userIdRegex).required(),
-        fsObjectsId: JoiObjectId.required(),
+        fsObjectId: JoiObjectId.required(),
         permission: Joi.string()
             .valid(...permissions)
             .required(),
@@ -139,7 +139,7 @@ export const createShortcutRequestSchema = Joi.object({
     params: {},
     body: {
         name: Joi.string().required(),
-        parent: JoiObjectId.default(null),
+        parent: JoiObjectId.allow(null).default(null),
         ref: JoiObjectId.required(),
     },
 });
@@ -167,7 +167,9 @@ export const duplicateFileRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().required(),
-        parent: JoiObjectId.default(null),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
+        size: Joi.number().min(minFileSizeInBytes).max(maxFileSizeInBytes).required(),
+        client: Joi.string().required(),
     },
 });
 
@@ -178,7 +180,7 @@ export const patchFileRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: JoiObjectId.optional(),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
         public: Joi.boolean().optional(),
     },
 });
@@ -190,7 +192,7 @@ export const patchFolderRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: JoiObjectId.optional(),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
     },
 });
 
@@ -244,7 +246,7 @@ export const removeFavoritesRequestSchema = Joi.object({
     body: {},
 });
 
-export const generateShareLinkReqSchema = Joi.object({
+export const generateShareTokenReqSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
@@ -253,11 +255,11 @@ export const generateShareLinkReqSchema = Joi.object({
         permission: Joi.string()
             .valid(...permissions)
             .required(),
-        time: Joi.string().required(),
+        expirationInSec: Joi.number().integer().min(0).required(),
     },
 });
 
-export const getShareLinkRequestSchema = Joi.object({
+export const getPermissionByTokenRequestSchema = Joi.object({
     query: {
         token: Joi.string().required(),
     },

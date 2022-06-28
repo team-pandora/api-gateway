@@ -69,14 +69,14 @@ export const restoreShortcut = async (req: Request, res: Response) => {
 };
 
 export const createFavorite = async (req: Request, res: Response) => {
-    res.json(await usersManager.createFavorite(req.user.id, req.body.fsObjectIds));
+    res.json(await usersManager.createFavorite(req.user.id, req.body.fsObjectId));
 };
 
 export const getFsObjectHierarchy = async (req: Request, res: Response) => {
-    res.json(await usersManager.getFsObjectHierarchy(req.user.id, req.body.fsObjectId));
+    res.json(await usersManager.getFsObjectHierarchy(req.user.id, req.params.fsObjectId));
 };
 
-export const updatePermission = async (req: Request, res: Response) => {
+export const updateFsObjectPermission = async (req: Request, res: Response) => {
     const { userId, permission } = req.body;
     res.json(await usersManager.updateFsObjectPermission(req.user.id, req.params.fsObjectId, userId, permission));
 };
@@ -94,20 +94,28 @@ export const unshareFsObject = async (req: Request, res: Response) => {
     res.json(await usersManager.unshareFsObject(req.user.id, req.params.fsObjectId, sharedUserId));
 };
 
-export const deleteFile = async (req: Request, res: Response) => {
+export const moveFileToTrash = async (req: Request, res: Response) => {
     res.json(await usersManager.moveFileToTrash(req.user.id, req.params.fsObjectId));
 };
 
-export const deleteFolder = async (req: Request, res: Response) => {
+export const moveFolderToTrash = async (req: Request, res: Response) => {
     res.json(await usersManager.moveFolderToTrash(req.user.id, req.params.fsObjectId));
 };
 
-export const deleteShortcut = async (req: Request, res: Response) => {
+export const moveShortcutToTrash = async (req: Request, res: Response) => {
     res.json(await usersManager.moveShortcutToTrash(req.user.id, req.params.fsObjectId));
 };
 
-export const deletePermanent = async (req: Request, res: Response) => {
-    res.json(await usersManager.deleteFilePermanent(req.user.id, req.params.fsObjectId));
+export const deleteFileFromTrash = async (req: Request, res: Response) => {
+    res.json(await usersManager.deleteFileFromTrash(req.user.id, req.params.fsObjectId));
+};
+
+export const deleteFolderFromTrash = async (req: Request, res: Response) => {
+    res.json(await usersManager.deleteFolderFromTrash(req.user.id, req.params.fsObjectId));
+};
+
+export const deleteShortcutFromTrash = async (req: Request, res: Response) => {
+    res.json(await usersManager.deleteShortcutFromTrash(req.user.id, req.params.fsObjectId));
 };
 
 export const downloadFile = async (req: Request, res: Response) => {
@@ -131,10 +139,10 @@ export const duplicateFile = async (req: Request, res: Response) => {
     res.json(await usersManager.duplicateFile(req.user.id, req.params.fsObjectId, req.body));
 };
 
-export const generateShareLink = async (req: Request, res: Response) => {
-    res.json(await usersManager.generateShareLink(req.user.id, req.params.fsObjectId, req.body));
+export const generateShareToken = async (req: Request, res: Response) => {
+    res.json(await usersManager.generateShareToken(req.user.id, req.params.fsObjectId, req.body));
 };
 
-export const shareByLink = async (req: Request, res: Response) => {
-    res.json(await usersManager.shareByLink(req.params.token, req.user.id));
+export const getPermissionByToken = async (req: Request, res: Response) => {
+    res.json(await usersManager.getPermissionByToken(req.query.token as string, req.user.id));
 };
