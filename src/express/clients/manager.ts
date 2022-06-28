@@ -26,7 +26,7 @@ export const uploadFile = async (client: string, req: Request, file: INewFile) =
             );
     });
 
-    if (uploadResponse.data.size !== file.size) {
+    if (uploadResponse?.data?.size !== file.size) {
         await fsService.delete(`/clients/${client}/fs/file`, { params: { _id: response.data._id } }).catch((error) => {
             logger.log('error', `Failed to delete file from fs (size mismatch cleanup): ${error.message}`);
         });
@@ -60,7 +60,8 @@ export const reUploadFile = async (client: string, req: Request, fileId: string,
                     await fsService.delete(`/clients/${client}/fs/file`, { params: { _id: response.data._id } });
                 }),
             );
-        if (uploadResponse.data.size !== size) {
+
+        if (uploadResponse?.data?.size !== size) {
             logger.log(
                 'error',
                 `File size mismatch on reUpload, file: ${fileId}, expected: ${size}, actual: ${uploadResponse.data.size}`,
