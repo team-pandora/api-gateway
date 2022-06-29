@@ -48,6 +48,10 @@ export const uploadFile = async (req: Request, res: Response) => {
     res.json(await usersManager.uploadFile(req, req.query));
 };
 
+export const reUploadFile = async (req: Request<{ fileId: string }, any, {}, any>, res: Response) => {
+    res.json(await usersManager.reUploadFile(req.user.id, req, req.params.fileId, req.query.size));
+};
+
 export const createFolder = async (req: Request, res: Response) => {
     res.json(await usersManager.createFolder(req.user.id, req.body));
 };
@@ -127,7 +131,8 @@ export const downloadFile = async (req: Request, res: Response) => {
 export const downloadFolder = async (req: Request, res: Response) => {
     const rootFolder = await usersManager.getFsObject(req.user.id, req.params.fsObjectId);
     const archive = await usersManager.downloadFolder(req.user.id, req.params.fsObjectId);
-    res.attachment(`${rootFolder.data.name}.zip`);
+
+    res.attachment(`${rootFolder.name}.zip`);
     res.setHeader('Content-type', 'application/zip');
 
     archive.pipe(res);

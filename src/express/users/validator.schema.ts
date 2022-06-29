@@ -125,12 +125,27 @@ export const uploadFileRequestSchema = Joi.object({
     body: {},
 });
 
+export const reUploadFileRequestSchema = Joi.object({
+    headers: Joi.object({
+        'content-type': Joi.string()
+            .regex(/.*multipart\/form-data.*/)
+            .required(),
+    }).unknown(),
+    query: {
+        size: Joi.number().min(minFileSizeInBytes).max(maxFileSizeInBytes).required(),
+    },
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {},
+});
+
 export const createFolderRequestSchema = Joi.object({
     query: {},
     params: {},
     body: {
         name: Joi.string().required(),
-        parent: JoiObjectId.default(null),
+        parent: JoiObjectId.allow(null).default(null),
     },
 });
 

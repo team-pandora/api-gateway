@@ -73,6 +73,12 @@ usersRouter.post(
 );
 
 usersRouter.post(
+    '/files/:fsObjectId/reupload',
+    ValidateRequest(ValidatorSchemas.reUploadFileRequestSchema),
+    wrapMiddleware(UsersController.reUploadFile),
+);
+
+usersRouter.post(
     '/fs/folder',
     ValidateRequest(ValidatorSchemas.createFolderRequestSchema),
     wrapMiddleware(UsersController.createFolder),
@@ -102,6 +108,7 @@ usersRouter.post(
     wrapMiddleware(UsersController.restoreShortcut),
 );
 
+// TODO: change fsObjectId to params not body
 usersRouter.post(
     '/fs/favorite',
     ValidateRequest(ValidatorSchemas.createFavoriteRequestSchema),

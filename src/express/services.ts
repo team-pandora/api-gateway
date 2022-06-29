@@ -25,5 +25,5 @@ export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => P
 };
 
 export const storageService = axios.create({
-    baseURL: `${config.service.storageServiceUrl}/api`,
+    baseURL: `${config.service.storageServiceUrl}/api/storage`,
 });

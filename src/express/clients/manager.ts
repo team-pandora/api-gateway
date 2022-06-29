@@ -16,7 +16,7 @@ export const uploadFile = async (client: string, req: Request, file: INewFile) =
         const formData = new FormData();
         formData.append('file', fileStream);
         return storageService
-            .post(`/bucket/${client}/key/${response.data._id}`, formData, {
+            .post(`/bucket/${client}/object/${response.data._id}`, formData, {
                 headers: formData.getHeaders(),
             })
             .catch(
@@ -52,7 +52,7 @@ export const reUploadFile = async (client: string, req: Request, fileId: string,
         const formData = new FormData();
         formData.append('file', fileStream);
         const uploadResponse = await storageService
-            .post(`/bucket/${client}/key/${response.data._id}`, formData, {
+            .post(`/bucket/${client}/object/${response.data._id}`, formData, {
                 headers: formData.getHeaders(),
             })
             .catch(
@@ -74,7 +74,7 @@ export const reUploadFile = async (client: string, req: Request, fileId: string,
 
 export const downloadFile = async (client: string, fileId: string) => {
     const response = await storageService
-        .get(`/bucket/${client}/key/${fileId}`, { responseType: 'stream' })
+        .get(`/bucket/${client}/object/${fileId}`, { responseType: 'stream' })
         .catch(serviceErrorHandler('Failed to download file'));
 
     return response.data;

@@ -55,7 +55,6 @@ export const getFsObject = async (userId: string, fsObjectId: string) => {
             params: { fsObjectId },
         })
         .catch(serviceErrorHandler('Failed to get fsObject'));
-
     return response.data[0];
 };
 
@@ -116,31 +115,60 @@ export const uploadFile = async (req: Request, file: INewFile) => {
         const formData = new FormData();
         formData.append('file', fileStream);
         return storageService
-            .post(`/bucket/${req.user.id}/key/${response.data._id}`, formData, {
+            .post(`/bucket/${req.user.id}/object/${response.data.fsObjectId}`, formData, {
                 headers: formData.getHeaders(),
             })
             .catch(
                 serviceErrorHandler('Failed to upload file', async () => {
-                    await fsService.delete(`/users/${req.user.id}/fs/file`, { params: { _id: response.data._id } });
+                    await fsService.delete(`/users/${req.user.id}/fs/file/${response.data.fsObjectId}`);
                 }),
             );
     });
 
     if (uploadResponse.data.size !== file.size) {
-        await fsService
-            .delete(`/users/${req.user.id}/fs/file`, { params: { _id: response.data._id } })
-            .catch((error) => {
-                logger.log('error', `Failed to delete file from fs (size mismatch cleanup): ${error.message}`);
-            });
-        await storageService.delete(`/bucket/${req.user.id}`, { data: { key: [response.data._id] } }).catch((error) => {
-            logger.log('error', `Failed to delete file from storage (size mismatch cleanup): ${error.message}`);
+        await fsService.delete(`/users/${req.user.id}/fs/file/${response.data.fsObjectId}`).catch((error) => {
+            logger.log('error', `Failed to delete file from fs (size mismatch cleanup): ${error.message}`);
         });
+        await storageService
+            .delete(`/bucket/${req.user.id}`, { data: { objectsList: [response.data.fsObjectId] } })
+            .catch((error) => {
+                logger.log('error', `Failed to delete file from storage (size mismatch cleanup): ${error.message}`);
+            });
 
         throw new ServerError(
             StatusCodes.BAD_REQUEST,
             `Failed to upload file, file size mismatch, expected: ${file.size}, actual: ${uploadResponse.data.size}`,
         );
     }
+
+    return response.data;
+};
+
+export const reUploadFile = async (userId: string, req: Request, fileId: string, size: number) => {
+    const response = await fsService
+        .patch(`/users/${userId}/fs/file/${fileId}`, { size })
+        .catch(serviceErrorHandler('Failed to update file'));
+
+    await handleFileUpload(req, async (fileStream) => {
+        const formData = new FormData();
+        formData.append('file', fileStream);
+        const uploadResponse = await storageService
+            .post(`/bucket/${userId}/object/${response.data._id}`, formData, {
+                headers: formData.getHeaders(),
+            })
+            .catch(
+                serviceErrorHandler('Failed to upload file', async () => {
+                    await fsService.delete(`/users/${userId}/fs/file`, { params: { _id: response.data._id } });
+                }),
+            );
+
+        if (uploadResponse?.data?.size !== size) {
+            logger.log(
+                'error',
+                `File size mismatch on reUpload, file: ${fileId}, expected: ${size}, actual: ${uploadResponse.data.size}`,
+            );
+        }
+    });
 
     return response.data;
 };
@@ -245,7 +273,7 @@ export const moveFileToTrash = async (userId: string, fileId: string) => {
 
 export const moveFolderToTrash = async (userId: string, folderId: string) => {
     const response = await fsService
-        .delete(`/users/${userId}/fs/folder/${folderId}/trash`)
+        .post(`/users/${userId}/fs/folder/${folderId}/trash`)
         .catch(serviceErrorHandler('Failed to move folder to trash'));
 
     return response.data;
@@ -253,7 +281,7 @@ export const moveFolderToTrash = async (userId: string, folderId: string) => {
 
 export const moveShortcutToTrash = async (userId: string, shortcutId: string) => {
     const response = await fsService
-        .delete(`/users/${userId}/fs/shortcut/${shortcutId}/trash`)
+        .post(`/users/${userId}/fs/shortcut/${shortcutId}/trash`)
         .catch(serviceErrorHandler('Failed to move shortcut to trash'));
 
     return response.data;
@@ -264,11 +292,9 @@ export const deleteFileFromTrash = async (userId: string, fsObjectId: string) =>
         .delete(`/users/${userId}/fs/file/${fsObjectId}/trash`)
         .catch(serviceErrorHandler('Failed to delete file from trash'));
 
-    await storageService
-        .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}`, { data: { key: [fsObjectId] } })
-        .catch((error) => {
-            logger.log('error', `Failed to delete file '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
-        });
+    await storageService.delete(`/bucket/${userId}`, { data: { objectNames: [fsObjectId] } }).catch((error) => {
+        logger.log('error', `Failed to delete file '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
+    });
 
     return response.data;
 };
@@ -279,8 +305,8 @@ export const deleteFolderFromTrash = async (userId: string, fsObjectId: string) 
         .catch(serviceErrorHandler('Failed to delete folder'));
 
     await storageService
-        .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}`, {
-            data: { key: response.data.deletedFileIds },
+        .delete(`/bucket/${userId}`, {
+            data: { objectNames: response.data.deletedFiles },
         })
         .catch((error) => {
             logger.log(
@@ -297,11 +323,9 @@ export const deleteShortcutFromTrash = async (userId: string, fsObjectId: string
         .delete(`/users/${userId}/fs/shortcut/${fsObjectId}/trash`)
         .catch(serviceErrorHandler('Failed to delete file'));
 
-    await storageService
-        .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}`, { data: { key: [fsObjectId] } })
-        .catch((error) => {
-            logger.log('error', `Failed to delete file '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
-        });
+    await storageService.delete(`/bucket/${userId}`, { data: { key: [fsObjectId] } }).catch((error) => {
+        logger.log('error', `Failed to delete file '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
+    });
 
     return response.data;
 };
@@ -311,14 +335,9 @@ export const deleteFolderPermanent = async (userId: string, fsObjectId: string) 
         .delete(`/users/${userId}/fs/folder/${fsObjectId}/trash`)
         .catch(serviceErrorHandler('Failed to delete file'));
 
-    await storageService
-        .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}`, { data: { key: [fsObjectId] } })
-        .catch((error) => {
-            logger.log(
-                'error',
-                `Failed to delete folder '${fsObjectId}' with bucket '${userId}' from storage: ${error}`,
-            );
-        });
+    await storageService.delete(`/bucket/${userId}`, { data: { key: [fsObjectId] } }).catch((error) => {
+        logger.log('error', `Failed to delete folder '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
+    });
 
     return response.data;
 };
@@ -328,21 +347,16 @@ export const deleteShortcutPermanent = async (userId: string, fsObjectId: string
         .delete(`/users/${userId}/fs/shortcut/${fsObjectId}/trash`)
         .catch(serviceErrorHandler('Failed to delete file'));
 
-    await storageService
-        .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}`, { data: { key: [fsObjectId] } })
-        .catch((error) => {
-            logger.log(
-                'error',
-                `Failed to delete shortcut '${fsObjectId}' with bucket '${userId}' from storage: ${error}`,
-            );
-        });
+    await storageService.delete(`/bucket/${userId}`, { data: { key: [fsObjectId] } }).catch((error) => {
+        logger.log('error', `Failed to delete shortcut '${fsObjectId}' with bucket '${userId}' from storage: ${error}`);
+    });
 
     return response.data;
 };
 
 export const downloadFile = async (userId: string, fileId: string) => {
     const response = await storageService
-        .get(`/storage/bucket/${userId}/key/${fileId}`, {
+        .get(`/bucket/${userId}/object/${fileId}`, {
             responseType: 'stream',
         })
         .catch(serviceErrorHandler('Failed to download file'));
@@ -351,35 +365,38 @@ export const downloadFile = async (userId: string, fileId: string) => {
 };
 
 export const downloadFolder = async (userId: string, folderId: string) => {
-    const hierarchyObject: any = {};
-    const children = await getFolderChildren(userId, folderId);
+    const childrenHierarchies: any = {};
+    const children: { _id: string; parent: string; name: string; type: 'folder' | 'file' }[] = await getFolderChildren(
+        userId,
+        folderId,
+    );
 
-    children.data.forEach((child) => {
+    children.forEach((child) => {
         if (child.parent === folderId) {
-            hierarchyObject[child._id] = `${child.name}`;
+            childrenHierarchies[child._id] = `${child.name}`;
         } else {
-            hierarchyObject[child._id] = `${hierarchyObject[child.parent]}/${child.name}`;
+            childrenHierarchies[child._id] = `${childrenHierarchies[child.parent]}/${child.name}`;
         }
     });
 
     const archive = archiver('zip');
 
-    archive.on('error', (err) => {
-        throw err;
-    });
+    // archive.on('error', (err) => {
+    //     throw err;
+    // });
 
-    const results: Promise<any>[] = [];
-    children.forEach((child) => {
-        if (child.type === 'file') {
-            results.push(downloadFile(userId, child._id));
-        }
-    });
+    const promises: Promise<void>[] = [];
 
-    Promise.all(results).then((files) => {
-        files.forEach((file) => {
-            archive.append(file, { name: hierarchyObject[file._id] });
-        });
-    });
+    const files = children.filter((child) => child.type === 'file');
+    for (let i = 0; i < files.length; i += 1) {
+        promises.push(
+            downloadFile(userId, files[i]._id).then((fileStream) => {
+                archive.append(fileStream, { name: childrenHierarchies[files[i]._id] });
+            }),
+        );
+    }
+
+    await Promise.all(promises);
 
     return archive;
 };
@@ -390,7 +407,7 @@ export const duplicateFile = async (userId: string, fileId: string, file: INewFi
         .catch(serviceErrorHandler('Failed to create file'));
 
     await storageService
-        .post(`/storage/copy`, {
+        .post(`/copy`, {
             bucketName: userId,
             objectName: fileId,
             sourceBucket: userId,
@@ -466,15 +483,13 @@ export const createFavorites = async (userId: string, fsObjectIds: string[]) => 
 export const deletePermanents = async (userId: string, fsObjectIds: string[]) => {
     const results: Promise<any>[] = [];
     fsObjectIds.forEach((fsObjectId) => {
-        results.push(
-            storageService.delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}/key/${fsObjectId}`),
-        );
+        results.push(storageService.delete(`/bucket/${userId}/object/${fsObjectId}`));
     });
 
     Promise.all(results).then((files) => {
         files.forEach(async (file) => {
             await storageService
-                .delete(`${config.service.storageServiceUrl}/storage/bucket/${userId}/key/${file.data._id}`)
+                .delete(`/bucket/${userId}/object/${file.data._id}`)
                 .catch(serviceErrorHandler('Failed to delete file from S3'));
         });
     });
