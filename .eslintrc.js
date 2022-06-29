@@ -38,5 +38,6 @@ module.exports = {
         'no-default-export': 'off',
         'import/prefer-default-export': 'off',
         'no-underscore-dangle': 'off',
+        'no-plusplus': 'off',
     },
 };

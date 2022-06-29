@@ -5,7 +5,7 @@ import logger from '../utils/logger';
 import { ServerError } from './error';
 
 export const fsService = axios.create({
-    baseURL: `${config.service.fsServiceUrl}/api`,
+    baseURL: `${config.service.fsCrudUrl}/api`,
 });
 
 export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => Promise<any>) => async (error: any) => {

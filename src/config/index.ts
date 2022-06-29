@@ -5,7 +5,7 @@ const config = {
     service: {
         port: env.get('PORT').required().asPortNumber(),
         useCors: env.get('USE_CORS').default('false').asBool(),
-        fsServiceUrl: env.get('FILE_SERVICE_URL').asString(),
+        fsCrudUrl: env.get('FS_CRUD_URL').asString(),
         transfersUrl: env.get('TRANSFER_SERVICE_URL').asString(),
         storageServiceUrl: env.get('STORAGE_SERVICE_URL').asString(),
         kartoffelServiceUrl: env.get('KARTOFFEL_SERVICE_URL').asString(),

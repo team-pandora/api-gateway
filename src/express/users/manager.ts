@@ -10,7 +10,7 @@ import logger from '../../utils/logger';
 import { IAggregateStatesAndFsObjectsQuery, permission } from '../clients/interface';
 import { ServerError } from '../error';
 import { fsService, serviceErrorHandler, storageService } from '../services';
-import { IGenerateLink, INewFile, IUpdateFsObject, IUserGetReq } from './interface';
+import { IFsObject, IGenerateLink, INewFile, IUpdateFsObject, IUserGetReq } from './interface';
 
 const getFolderChildren = async (userId: string, folderId: string) => {
     const response = await fsService
@@ -365,38 +365,30 @@ export const downloadFile = async (userId: string, fileId: string) => {
 };
 
 export const downloadFolder = async (userId: string, folderId: string) => {
-    const childrenHierarchies: any = {};
-    const children: { _id: string; parent: string; name: string; type: 'folder' | 'file' }[] = await getFolderChildren(
-        userId,
-        folderId,
-    );
+    const children: IFsObject[] = await getFolderChildren(userId, folderId);
+    const files = children.filter((child) => child.type === 'file');
 
-    children.forEach((child) => {
-        if (child.parent === folderId) {
-            childrenHierarchies[child._id] = `${child.name}`;
-        } else {
-            childrenHierarchies[child._id] = `${childrenHierarchies[child.parent]}/${child.name}`;
-        }
-    });
+    const childrenHierarchies: { [key: string]: string } = { [folderId]: '' };
+
+    for (let i = 0; i < children.length; i++) {
+        const { _id, parent, name } = children[i];
+        childrenHierarchies[_id] = `${childrenHierarchies[parent || folderId]}/${name}`;
+    }
 
     const archive = archiver('zip');
 
-    // archive.on('error', (err) => {
-    //     throw err;
-    // });
+    await new Promise((resolve, reject) => {
+        archive.on('error', (err) => {
+            reject(new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to download folder', err));
+        });
 
-    const promises: Promise<void>[] = [];
+        const downloadPromises = files.map(async ({ _id }) => {
+            const fileStream = await downloadFile(userId, _id);
+            archive.append(fileStream, { name: childrenHierarchies[_id] });
+        });
 
-    const files = children.filter((child) => child.type === 'file');
-    for (let i = 0; i < files.length; i += 1) {
-        promises.push(
-            downloadFile(userId, files[i]._id).then((fileStream) => {
-                archive.append(fileStream, { name: childrenHierarchies[files[i]._id] });
-            }),
-        );
-    }
-
-    await Promise.all(promises);
+        Promise.all(downloadPromises).then(resolve).catch(reject);
+    });
 
     return archive;
 };
