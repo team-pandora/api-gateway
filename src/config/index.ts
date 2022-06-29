@@ -9,6 +9,7 @@ const config = {
         transfersUrl: env.get('TRANSFER_SERVICE_URL').asString(),
         storageServiceUrl: env.get('STORAGE_SERVICE_URL').asString(),
         kartoffelServiceUrl: env.get('KARTOFFEL_SERVICE_URL').asString(),
+        linkSecret: env.get('LINK_SECRET').required().asString(),
     },
     validations: {
         userIdRegex: env.get('USER_ID_REGEX').default('^[a-zA-Z0-9s._@-]{1,100}$').asRegExp(),
@@ -28,7 +29,6 @@ const config = {
         statesSortFields: ['stateCreatedAt', 'stateUpdatedAt'] as const,
         fsObjectsSortFields: ['size', 'public', 'name', 'type', 'fsObjectCreatedAt', 'fsObjectUpdatedAt'] as const,
         sortOrders: ['asc', 'desc'] as const,
-        jwtSecret: env.get('JWT_SECRET').required().asString(),
     },
     spike: {
         enabled: env.get('SPIKE_ENABLED').required().asBool(),

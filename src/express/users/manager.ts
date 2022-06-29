@@ -404,7 +404,7 @@ export const duplicateFile = async (userId: string, fileId: string, file: INewFi
 };
 
 export const generateShareToken = async (userId: string, fsObjectId: string, body: IGenerateLink) => {
-    const token = jwt.sign({ ...body, userId, fsObjectId }, config.constants.jwtSecret, {
+    const token = jwt.sign({ ...body, userId, fsObjectId }, config.service.linkSecret, {
         algorithm: 'HS256',
         expiresIn: body.time,
     });
@@ -413,7 +413,7 @@ export const generateShareToken = async (userId: string, fsObjectId: string, bod
 };
 
 export const getPermissionByToken = async (token: string, recipientId: string) => {
-    const payload = jwt.verify(token, config.constants.jwtSecret);
+    const payload = jwt.verify(token, config.service.linkSecret);
 
     if (typeof payload !== 'object' || !payload.exp) {
         throw new Error('Invalid JWT payload');
