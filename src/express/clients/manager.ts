@@ -4,8 +4,8 @@ import { StatusCodes } from 'http-status-codes';
 import { handleFileUpload } from '../../utils/express/file';
 import logger from '../../utils/logger';
 import { ServerError } from '../error';
+import { IAggregateStatesAndFsObjectsQuery, INewFile, permission } from '../interface';
 import { fsService, serviceErrorHandler, storageService } from '../services';
-import { IAggregateStatesAndFsObjectsQuery, INewFile, permission } from './interface';
 
 export const uploadFile = async (client: string, req: Request, file: INewFile) => {
     const response = await fsService

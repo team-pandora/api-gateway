@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../config';
 
 const { permissions, fsObjectTypes, statesSortFields, fsObjectsSortFields, sortOrders } = config.constants;
 
@@ -8,11 +8,39 @@ type fsObjectsSortField = typeof fsObjectsSortFields[number];
 type statesSortField = typeof statesSortFields[number];
 type sortOrder = typeof sortOrders[number];
 
-export interface INewFile {
+export type IFsObject = {
+    _id: string;
     name: string;
-    size: number;
+    parent: string | null;
+    type: fsObjectType;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+export type IUserGetReq = {
+    userId?: string;
+    name?: string;
+    mail?: string;
+    source?: string;
+};
+
+export type INewFile = {
+    name?: string;
+    parent?: string | null;
     public?: boolean;
-}
+    size?: number;
+};
+
+export type IUpdateFsObject = {
+    name: string;
+    parent: string | null;
+    public: boolean;
+};
+
+export type IGenerateLink = {
+    expirationInSec: string;
+    permission: string;
+};
 
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters

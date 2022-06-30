@@ -7,10 +7,17 @@ import * as jwt from 'jsonwebtoken';
 import config from '../../config';
 import { handleFileUpload } from '../../utils/express/file';
 import logger from '../../utils/logger';
-import { IAggregateStatesAndFsObjectsQuery, permission } from '../clients/interface';
 import { ServerError } from '../error';
+import {
+    IAggregateStatesAndFsObjectsQuery,
+    IFsObject,
+    IGenerateLink,
+    INewFile,
+    IUpdateFsObject,
+    IUserGetReq,
+    permission,
+} from '../interface';
 import { fsService, serviceErrorHandler, storageService } from '../services';
-import { IFsObject, IGenerateLink, INewFile, IUpdateFsObject, IUserGetReq } from './interface';
 
 const getFolderChildren = async (userId: string, folderId: string) => {
     const response = await fsService
