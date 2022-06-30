@@ -48,5 +48,5 @@ export const deleteFile = async (req: Request, res: Response) => {
 };
 
 export const unshareFile = async (req: Request, res: Response) => {
-    res.json(await clientsManager.unshareFile(req.client.clientName, req.params.fileId));
+    res.json(await clientsManager.unshareFile(req.client.clientName, req.params.fileId, req.body.userId));
 };

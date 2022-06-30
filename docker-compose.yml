@@ -17,3 +17,4 @@ services:
       FS_CRUD_URL: http://localhost:8001
       STORAGE_SERVICE_URL: http://localhost:8002
       LINK_SECRET: secret
+      SPIKE_CLIENTS_API_SCOPE: api

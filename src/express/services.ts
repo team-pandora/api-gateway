@@ -8,6 +8,10 @@ export const fsService = axios.create({
     baseURL: `${config.service.fsCrudUrl}/api`,
 });
 
+export const storageService = axios.create({
+    baseURL: `${config.service.storageServiceUrl}/api/storage`,
+});
+
 export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => Promise<any>) => async (error: any) => {
     if (!error?.response?.data) {
         throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, `${messagePrefix}, internal error`, error);
@@ -23,7 +27,3 @@ export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => P
 
     throw new ServerError(code, `${messagePrefix}, ${message}`, error);
 };
-
-export const storageService = axios.create({
-    baseURL: `${config.service.storageServiceUrl}/api/storage`,
-});

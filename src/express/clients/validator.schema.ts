@@ -150,5 +150,7 @@ export const unshareFileRequestSchema = Joi.object({
     params: {
         fileId: JoiObjectId.required(),
     },
-    body: {},
+    body: {
+        userId: Joi.string().regex(userIdRegex).required(),
+    },
 });

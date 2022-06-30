@@ -10,6 +10,7 @@ const config = {
         storageServiceUrl: env.get('STORAGE_SERVICE_URL').asString(),
         kartoffelServiceUrl: env.get('KARTOFFEL_SERVICE_URL').asString(),
         linkSecret: env.get('LINK_SECRET').required().asString(),
+        spikeClientsApiScope: env.get('SPIKE_CLIENTS_API_SCOPE').required().asString(),
     },
     validations: {
         userIdRegex: env.get('USER_ID_REGEX').default('^[a-zA-Z0-9s._@-]{1,100}$').asRegExp(),

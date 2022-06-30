@@ -1,5 +1,6 @@
 import { NextFunction, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import config from '../config';
 import {
     shragaAuthMiddleware as shraga,
     shragaCallbackMiddleware,
@@ -22,7 +23,7 @@ appRouter.get('/config', (_, res: Response, next: NextFunction) => {
 
 appRouter.use('/api/users', shraga, usersRouter);
 
-appRouter.use('/api/clients', spike(['api']), clientsRouter);
+appRouter.use('/api/clients', spike([config.service.spikeClientsApiScope]), clientsRouter);
 
 appRouter.use('/isAlive', (_, res) => {
     res.status(StatusCodes.OK).send('alive');

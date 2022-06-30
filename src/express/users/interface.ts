@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongoose';
 import config from '../../config';
 
 export type fsObjectType = typeof config.constants.fsObjectTypes[number];
@@ -21,14 +20,14 @@ export type IUserGetReq = {
 
 export type INewFile = {
     name?: string;
-    parent?: ObjectId;
+    parent?: string | null;
     public?: boolean;
     size?: number;
 };
 
 export type IUpdateFsObject = {
     name: string;
-    parent: ObjectId;
+    parent: string | null;
     public: boolean;
 };
 
