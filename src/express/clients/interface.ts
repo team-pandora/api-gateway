@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongoose';
 import config from '../../config';
 
 const { permissions, fsObjectTypes, statesSortFields, fsObjectsSortFields, sortOrders } = config.constants;
@@ -17,9 +16,9 @@ export interface INewFile {
 
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters
-    stateId?: ObjectId;
+    stateId?: string;
     userId?: string;
-    fsObjectId?: ObjectId | { $in: ObjectId[] };
+    fsObjectId?: string | { $in: string[] };
     favorite?: boolean;
     trash?: boolean;
     trashRoot?: boolean;
@@ -33,9 +32,9 @@ export interface IAggregateStatesAndFsObjectsQuery {
     size?: number | { $gt: number };
     public?: boolean;
     name?: string;
-    parent?: ObjectId;
+    parent?: string;
     type?: fsObjectType;
-    ref?: ObjectId;
+    ref?: string;
 
     // Sort
     sortBy?: statesSortField | fsObjectsSortField;

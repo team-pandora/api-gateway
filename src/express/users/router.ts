@@ -9,13 +9,13 @@ const usersRouter = Router();
 usersRouter.get(
     '/users',
     ValidateRequest(ValidatorSchemas.getUsersRequestSchema),
-    wrapMiddleware(UsersController.getUsers),
+    wrapMiddleware(UsersController.searchUsers),
 );
 
 usersRouter.get(
     '/users/:userId',
     ValidateRequest(ValidatorSchemas.getUserRequestSchema),
-    wrapMiddleware(UsersController.getUsers),
+    wrapMiddleware(UsersController.getUser),
 );
 
 usersRouter.get(
@@ -108,9 +108,8 @@ usersRouter.post(
     wrapMiddleware(UsersController.restoreShortcut),
 );
 
-// TODO: change fsObjectId to params not body
 usersRouter.post(
-    '/fs/favorite',
+    '/fs/:fsObjectId/favorite',
     ValidateRequest(ValidatorSchemas.createFavoriteRequestSchema),
     wrapMiddleware(UsersController.createFavorite),
 );

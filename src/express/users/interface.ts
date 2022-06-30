@@ -33,6 +33,6 @@ export type IUpdateFsObject = {
 };
 
 export type IGenerateLink = {
-    time: string;
+    expirationInSec: string;
     permission: string;
 };

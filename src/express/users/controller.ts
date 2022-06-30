@@ -3,7 +3,7 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import * as usersManager from './manager';
 
-export const getUsers = async (req: Request, res: Response) => {
+export const searchUsers = async (req: Request, res: Response) => {
     res.json(await usersManager.searchUsers(req.query));
 };
 
@@ -48,8 +48,8 @@ export const uploadFile = async (req: Request, res: Response) => {
     res.json(await usersManager.uploadFile(req, req.query));
 };
 
-export const reUploadFile = async (req: Request<{ fileId: string }, any, {}, any>, res: Response) => {
-    res.json(await usersManager.reUploadFile(req.user.id, req, req.params.fileId, req.query.size));
+export const reUploadFile = async (req: Request<{ fsObjectId: string }, any, {}, any>, res: Response) => {
+    res.json(await usersManager.reUploadFile(req.user.id, req, req.params.fsObjectId, req.query.size));
 };
 
 export const createFolder = async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ export const restoreShortcut = async (req: Request, res: Response) => {
 };
 
 export const createFavorite = async (req: Request, res: Response) => {
-    res.json(await usersManager.createFavorite(req.user.id, req.body.fsObjectId));
+    res.json(await usersManager.createFavorite(req.user.id, req.params.fsObjectId));
 };
 
 export const getFsObjectHierarchy = async (req: Request, res: Response) => {

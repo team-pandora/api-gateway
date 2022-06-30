@@ -15,7 +15,7 @@ import { IFsObject, IGenerateLink, INewFile, IUpdateFsObject, IUserGetReq } from
 const getFolderChildren = async (userId: string, folderId: string) => {
     const response = await fsService
         .get(`/users/${userId}/fs/folder/${folderId}/children`)
-        .catch(serviceErrorHandler('Failed to get folder children'));
+        .catch(serviceErrorHandler('Failed to download folder'));
 
     return response.data;
 };
@@ -144,9 +144,9 @@ export const uploadFile = async (req: Request, file: INewFile) => {
     return response.data;
 };
 
-export const reUploadFile = async (userId: string, req: Request, fileId: string, size: number) => {
+export const reUploadFile = async (userId: string, req: Request, fsObjectId: string, size: number) => {
     const response = await fsService
-        .patch(`/users/${userId}/fs/file/${fileId}`, { size })
+        .patch(`/users/${userId}/fs/file/${fsObjectId}`, { size })
         .catch(serviceErrorHandler('Failed to update file'));
 
     await handleFileUpload(req, async (fileStream) => {
@@ -165,7 +165,7 @@ export const reUploadFile = async (userId: string, req: Request, fileId: string,
         if (uploadResponse?.data?.size !== size) {
             logger.log(
                 'error',
-                `File size mismatch on reUpload, file: ${fileId}, expected: ${size}, actual: ${uploadResponse.data.size}`,
+                `File size mismatch on reUpload, file: ${fsObjectId}, expected: ${size}, actual: ${uploadResponse.data.size}`,
             );
         }
     });
@@ -355,6 +355,12 @@ export const deleteShortcutPermanent = async (userId: string, fsObjectId: string
 };
 
 export const downloadFile = async (userId: string, fileId: string) => {
+    const [file] = await getFsObjects(userId, { fsObjectId: fileId, type: 'file' });
+
+    if (!file) {
+        throw new ServerError(StatusCodes.NOT_FOUND, 'File not found');
+    }
+
     const response = await storageService
         .get(`/bucket/${userId}/object/${fileId}`, {
             responseType: 'stream',
@@ -393,29 +399,29 @@ export const downloadFolder = async (userId: string, folderId: string) => {
     return archive;
 };
 
-export const duplicateFile = async (userId: string, fileId: string, file: INewFile) => {
+export const duplicateFile = async (userId: string, fsObjectId: string, file: INewFile) => {
     const response = await fsService
         .post(`/users/${userId}/fs/file`, { ...file, public: false, bucket: userId })
         .catch(serviceErrorHandler('Failed to create file'));
 
     await storageService
-        .post(`/copy`, {
-            bucketName: userId,
-            objectName: fileId,
-            sourceBucket: userId,
-            sourceObject: response.data.fsObjectId,
+        .post(`/bucket/${userId}/object/${fsObjectId}/copy`, {
+            newBucketName: userId,
+            newObjectName: response.data.fsObjectId,
         })
         .catch(
             serviceErrorHandler('Failed to duplicate file', async () => {
                 await fsService.delete(`/users/${userId}/fs/file/${response.data.fsObjectId}`);
             }),
         );
+
+    return response.data;
 };
 
 export const generateShareToken = async (userId: string, fsObjectId: string, body: IGenerateLink) => {
     const token = jwt.sign({ ...body, userId, fsObjectId }, config.service.linkSecret, {
         algorithm: 'HS256',
-        expiresIn: body.time,
+        expiresIn: body.expirationInSec,
     });
 
     return { token };
@@ -428,10 +434,9 @@ export const getPermissionByToken = async (token: string, recipientId: string) =
         throw new Error('Invalid JWT payload');
     }
 
-    return shareFsObject(payload.userId, recipientId, payload.fsObjectId, payload.permission);
+    return shareFsObject(payload.userId, payload.fsObjectId, recipientId, payload.permission);
 };
 
-// Delete multiple fsObjects
 export const deleteFiles = async (userId: string, fsObjectIds: string[]) => {
     const results: Promise<any>[] = [];
     fsObjectIds.forEach((fsObjectId) => {

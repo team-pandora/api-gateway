@@ -169,10 +169,10 @@ export const restoreRequestSchema = Joi.object({
 
 export const createFavoriteRequestSchema = Joi.object({
     query: {},
-    params: {},
-    body: {
+    params: {
         fsObjectId: JoiObjectId.required(),
     },
+    body: {},
 });
 
 export const duplicateFileRequestSchema = Joi.object({
@@ -195,7 +195,7 @@ export const patchFileRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
+        parent: JoiObjectId.allow(null).default(null),
         public: Joi.boolean().optional(),
     },
 });
@@ -207,7 +207,7 @@ export const patchFolderRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
+        parent: JoiObjectId.allow(null).default(null).optional(),
     },
 });
 
@@ -218,7 +218,7 @@ export const patchShortcutRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: JoiObjectId.optional(),
+        parent: JoiObjectId.allow(null).default(null),
     },
 });
 
