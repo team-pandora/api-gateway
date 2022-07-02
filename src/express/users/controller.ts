@@ -3,12 +3,12 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import * as usersManager from './manager';
 
-export const searchUsers = async (req: Request, res: Response) => {
-    res.json(await usersManager.searchUsers(req.query));
+export const getUsers = async (req: Request, res: Response) => {
+    res.json(await usersManager.getUsers(req.query));
 };
 
 export const getUser = async (req: Request, res: Response) => {
-    res.json(await usersManager.getUser(req.params));
+    res.json(await usersManager.getUser(req.params.userId));
 };
 
 export const getQuota = async (req: Request, res: Response) => {
@@ -24,8 +24,8 @@ export const getFsObject = async (req: Request, res: Response) => {
 };
 
 export const shareFsObject = async (req: Request, res: Response) => {
-    const { userId, fsObjectId, permission } = req.body;
-    res.json(await usersManager.shareFsObject(req.user.id, fsObjectId, userId, permission));
+    const { userId, permission } = req.body;
+    res.json(await usersManager.shareFsObject(req.user.id, req.params.fsObjectId, userId, permission));
 };
 
 export const searchFsObject = async (req: Request, res: Response) => {
@@ -129,11 +129,11 @@ export const downloadFile = async (req: Request, res: Response) => {
 };
 
 export const downloadFolder = async (req: Request, res: Response) => {
-    const rootFolder = await usersManager.getFsObject(req.user.id, req.params.fsObjectId);
+    const folder = await usersManager.getFsObject(req.user.id, req.params.fsObjectId);
     const archive = await usersManager.downloadFolder(req.user.id, req.params.fsObjectId);
 
-    res.attachment(`${rootFolder.name}.zip`);
     res.setHeader('Content-type', 'application/zip');
+    res.attachment(`${folder.name}.zip`);
 
     archive.pipe(res);
     await archive.finalize();

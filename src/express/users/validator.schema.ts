@@ -6,11 +6,13 @@ const { permissions, fsObjectTypes, fsObjectsSortFields, statesSortFields, sortO
 const { fsObjectNameRegex: nameRegex, userIdRegex, minFileSizeInBytes, maxFileSizeInBytes } = config.validations;
 
 export const getUsersRequestSchema = Joi.object({
-    query: {
+    query: Joi.object({
         name: Joi.string().optional(),
         mail: Joi.string().optional(),
         source: Joi.string().required(),
-    },
+    })
+        .min(1)
+        .required(),
     params: {},
     body: {},
 });
@@ -81,7 +83,15 @@ export const getFsObjectRequestSchema = Joi.object({
     body: {},
 });
 
-export const downloadFsObjectRequestSchema = Joi.object({
+export const downloadFileRequestSchema = Joi.object({
+    query: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {},
+});
+
+export const downloadFolderRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
@@ -99,10 +109,11 @@ export const searchFsObjectsRequestSchema = Joi.object({
 
 export const shareFsObjectRequestSchema = Joi.object({
     query: {},
-    params: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
     body: {
         userId: Joi.string().regex(userIdRegex).required(),
-        fsObjectId: JoiObjectId.required(),
         permission: Joi.string()
             .valid(...permissions)
             .required(),

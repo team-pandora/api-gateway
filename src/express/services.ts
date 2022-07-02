@@ -12,6 +12,10 @@ export const storageService = axios.create({
     baseURL: `${config.service.storageServiceUrl}/api/storage`,
 });
 
+export const kartoffelService = axios.create({
+    baseURL: `${config.service.kartoffelUrl}/api`,
+});
+
 export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => Promise<any>) => async (error: any) => {
     if (!error?.response?.data) {
         throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, `${messagePrefix}, internal error`, error);

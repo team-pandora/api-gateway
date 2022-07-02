@@ -1,5 +1,4 @@
 import * as archiver from 'archiver';
-import axios from 'axios';
 import { Request } from 'express';
 import * as FormData from 'form-data';
 import { StatusCodes } from 'http-status-codes';
@@ -14,37 +13,39 @@ import {
     IGenerateLink,
     INewFile,
     IUpdateFsObject,
-    IUserGetReq,
+    IUserFilters,
     permission,
 } from '../interface';
-import { fsService, serviceErrorHandler, storageService } from '../services';
+import { fsService, kartoffelService, serviceErrorHandler, storageService } from '../services';
 
 const getFolderChildren = async (userId: string, folderId: string) => {
     const response = await fsService
         .get(`/users/${userId}/fs/folder/${folderId}/children`)
-        .catch(serviceErrorHandler('Failed to download folder'));
+        .catch(serviceErrorHandler('Failed to get folder data'));
 
     return response.data;
 };
 
-export const searchUsers = async (filters: IUserGetReq) => {
+export const getUsers = async (filters: IUserFilters) => {
     const { name, mail, source } = filters;
-    if (!mail) {
-        return axios.get(
-            `http://kartoffel.branch-yesodot.org/api/entities/search?fullName=${name}&digitalIdentity.source=${source}&expanded=true`,
-        );
-    }
-    return axios.get(`http://kartoffel.branch-yesodot.org/api/entities/digitalIdentity/${mail}&expanded=true`);
+
+    const searchUrn = mail
+        ? `/entities/digitalIdentity/${mail}&expanded=true`
+        : `/entities/search?fullName=${name}&digitalIdentity.source=${source}&expanded=true`;
+
+    const response = await kartoffelService.get(searchUrn).catch(serviceErrorHandler('Failed to get users'));
+    return response.data;
 };
 
-export const getUser = async (filters: IUserGetReq) => {
-    const { userId } = filters;
-    return axios.get(`http://kartoffel.branch-yesodot.org/api/entities/${userId}&expanded=true`);
+export const getUser = async (userId: string) => {
+    const response = await kartoffelService
+        .get(`/entities/${userId}&expanded=true`)
+        .catch(serviceErrorHandler('Failed to get user'));
+    return response.data;
 };
 
 export const getQuota = async (userId: string) => {
     const response = await fsService.get(`/users/${userId}/quota`).catch(serviceErrorHandler('Failed to get quota'));
-
     return response.data;
 };
 
@@ -52,7 +53,6 @@ export const getFsObjects = async (userId: string, query: IAggregateStatesAndFsO
     const response = await fsService
         .get(`/users/${userId}/states/fsObjects`, { params: query })
         .catch(serviceErrorHandler('Failed to get fsObjects'));
-
     return response.data;
 };
 
@@ -62,7 +62,10 @@ export const getFsObject = async (userId: string, fsObjectId: string) => {
             params: { fsObjectId },
         })
         .catch(serviceErrorHandler('Failed to get fsObject'));
-    return response.data[0];
+
+    const [fsObject] = response.data;
+    if (!fsObject) throw new ServerError(StatusCodes.NOT_FOUND, 'Failed to get fsObject');
+    return fsObject;
 };
 
 export const shareFsObject = async (
@@ -77,7 +80,6 @@ export const shareFsObject = async (
             sharedPermission,
         })
         .catch(serviceErrorHandler('Failed to share fsObject'));
-
     return response.data;
 };
 
@@ -85,7 +87,6 @@ export const searchFsObject = async (userId: string, query: string) => {
     const response = await fsService
         .get(`/users/${userId}/fsObjects/states/search`, { params: { query } })
         .catch(serviceErrorHandler('Failed to search fsObject'));
-
     return response.data;
 };
 
@@ -93,7 +94,6 @@ export const updateFile = async (userId: string, fsObjectId: string, body: IUpda
     const response = await fsService
         .patch(`/users/${userId}/fs/file/${fsObjectId}`, body)
         .catch(serviceErrorHandler('Failed to update file'));
-
     return response.data;
 };
 
@@ -232,7 +232,6 @@ export const getFsObjectHierarchy = async (userId: string, fsObjectId: string) =
     const response = await fsService
         .get(`/users/${userId}/fs/${fsObjectId}/hierarchy`)
         .catch(serviceErrorHandler('Failed to get fsObject hierarchy'));
-
     return response.data;
 };
 
@@ -363,17 +362,13 @@ export const deleteShortcutPermanent = async (userId: string, fsObjectId: string
 
 export const downloadFile = async (userId: string, fileId: string) => {
     const [file] = await getFsObjects(userId, { fsObjectId: fileId, type: 'file' });
-
-    if (!file) {
-        throw new ServerError(StatusCodes.NOT_FOUND, 'File not found');
-    }
+    if (!file) throw new ServerError(StatusCodes.NOT_FOUND, 'Failed to get file data');
 
     const response = await storageService
-        .get(`/bucket/${userId}/object/${fileId}`, {
+        .get(`/bucket/${file.bucket}/object/${fileId}`, {
             responseType: 'stream',
         })
         .catch(serviceErrorHandler('Failed to download file'));
-
     return response.data;
 };
 

@@ -17,7 +17,7 @@ export type IFsObject = {
     updatedAt: Date;
 };
 
-export type IUserGetReq = {
+export type IUserFilters = {
     userId?: string;
     name?: string;
     mail?: string;

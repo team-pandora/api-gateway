@@ -9,7 +9,7 @@ const usersRouter = Router();
 usersRouter.get(
     '/users',
     ValidateRequest(ValidatorSchemas.getUsersRequestSchema),
-    wrapMiddleware(UsersController.searchUsers),
+    wrapMiddleware(UsersController.getUsers),
 );
 
 usersRouter.get(
@@ -50,18 +50,18 @@ usersRouter.get(
 
 usersRouter.get(
     '/fs/file/:fsObjectId/download',
-    ValidateRequest(ValidatorSchemas.downloadFsObjectRequestSchema),
+    ValidateRequest(ValidatorSchemas.downloadFileRequestSchema),
     wrapMiddleware(UsersController.downloadFile),
 );
 
 usersRouter.get(
     '/fs/folder/:fsObjectId/download',
-    ValidateRequest(ValidatorSchemas.downloadFsObjectRequestSchema),
+    ValidateRequest(ValidatorSchemas.downloadFolderRequestSchema),
     wrapMiddleware(UsersController.downloadFolder),
 );
 
 usersRouter.post(
-    '/fs/share',
+    '/fs/:fsObjectId/share',
     ValidateRequest(ValidatorSchemas.shareFsObjectRequestSchema),
     wrapMiddleware(UsersController.shareFsObject),
 );
