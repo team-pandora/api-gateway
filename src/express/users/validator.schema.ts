@@ -127,10 +127,11 @@ export const uploadFileRequestSchema = Joi.object({
             .required(),
     }).unknown(),
     query: {
-        parent: JoiObjectId.default(null),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.string().valid('null').empty('null').default(null)).required(),
         name: Joi.string().regex(nameRegex).required(),
         public: Joi.boolean().required(),
         size: Joi.number().min(minFileSizeInBytes).max(maxFileSizeInBytes).required(),
+        client: Joi.string().required(),
     },
     params: {},
     body: {},
@@ -170,7 +171,7 @@ export const createShortcutRequestSchema = Joi.object({
     },
 });
 
-export const restoreRequestSchema = Joi.object({
+export const restoreFsObjectRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
@@ -178,7 +179,7 @@ export const restoreRequestSchema = Joi.object({
     body: {},
 });
 
-export const createFavoriteRequestSchema = Joi.object({
+export const favoriteFsObjectRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),
@@ -193,8 +194,7 @@ export const duplicateFileRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().required(),
-        parent: Joi.alternatives().try(JoiObjectId, Joi.any().valid(null)).required(),
-        size: Joi.number().min(minFileSizeInBytes).max(maxFileSizeInBytes).required(),
+        parent: JoiObjectId.allow(null).default(null),
         client: Joi.string().required(),
     },
 });
@@ -218,7 +218,7 @@ export const patchFolderRequestSchema = Joi.object({
     },
     body: {
         name: Joi.string().optional(),
-        parent: JoiObjectId.allow(null).default(null).optional(),
+        parent: JoiObjectId.allow(null).default(null),
     },
 });
 
@@ -246,6 +246,14 @@ export const updateFsObjectPermissionRequestSchema = Joi.object({
     },
 });
 
+export const moveFsObjectToTrashRequestSchema = Joi.object({
+    body: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    query: {},
+});
+
 export const deleteFsObjectRequestSchema = Joi.object({
     body: {},
     params: {
@@ -264,7 +272,7 @@ export const unshareFsObjectRequestSchema = Joi.object({
     },
 });
 
-export const removeFavoritesRequestSchema = Joi.object({
+export const unfavoriteRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),

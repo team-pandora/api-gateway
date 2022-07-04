@@ -8,39 +8,59 @@ type fsObjectsSortField = typeof fsObjectsSortFields[number];
 type statesSortField = typeof statesSortFields[number];
 type sortOrder = typeof sortOrders[number];
 
-export type IFsObject = {
+export interface IFsObject {
     _id: string;
     name: string;
     parent: string | null;
     type: fsObjectType;
     createdAt: Date;
     updatedAt: Date;
-};
+}
 
-export type IUserFilters = {
+export interface IFile extends IFsObject {
+    bucket: string;
+    size: number;
+    public: boolean;
+    client: string;
+}
+
+export interface IFolder extends IFsObject {}
+
+export interface IShortcut extends IFsObject {
+    ref: string;
+}
+
+export interface IUserFilters {
     userId?: string;
     name?: string;
     mail?: string;
     source?: string;
-};
+}
 
-export type INewFile = {
+export interface INewFile {
     name?: string;
     parent?: string | null;
     public?: boolean;
     size?: number;
-};
+    client?: string;
+}
 
-export type IUpdateFsObject = {
+export interface IDuplicateFile {
+    name?: string;
+    parent?: string | null;
+    client?: string;
+}
+
+export interface IUpdateFsObject {
     name: string;
     parent: string | null;
     public: boolean;
-};
+}
 
-export type IGenerateLink = {
+export interface IGenerateLink {
     expirationInSec: string;
     permission: string;
-};
+}
 
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters

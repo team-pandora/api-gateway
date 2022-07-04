@@ -18,7 +18,7 @@ export const uploadFile = async (client: string, req: Request, newFile: INewFile
         const formData = new FormData();
         formData.append('file', fileStream);
         return storageService
-            .post(`/bucket/${client}/object/${file._id}`, formData, {
+            .post(`/bucket/${file.bucket}/object/${file._id}`, formData, {
                 headers: formData.getHeaders(),
             })
             .catch(

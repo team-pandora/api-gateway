@@ -39,7 +39,7 @@ usersRouter.get(
 usersRouter.get(
     '/fs/search',
     ValidateRequest(ValidatorSchemas.searchFsObjectsRequestSchema),
-    wrapMiddleware(UsersController.searchFsObject),
+    wrapMiddleware(UsersController.searchFsObjects),
 );
 
 usersRouter.get(
@@ -60,10 +60,16 @@ usersRouter.get(
     wrapMiddleware(UsersController.downloadFolder),
 );
 
+usersRouter.get(
+    '/fs/:fsObjectId/permission/token',
+    ValidateRequest(ValidatorSchemas.getPermissionByTokenRequestSchema),
+    wrapMiddleware(UsersController.getPermissionByToken),
+);
+
 usersRouter.post(
-    '/fs/:fsObjectId/share',
-    ValidateRequest(ValidatorSchemas.shareFsObjectRequestSchema),
-    wrapMiddleware(UsersController.shareFsObject),
+    '/fs/:fsObjectId/share/token',
+    ValidateRequest(ValidatorSchemas.generateShareTokenReqSchema),
+    wrapMiddleware(UsersController.generateShareToken),
 );
 
 usersRouter.post(
@@ -91,27 +97,51 @@ usersRouter.post(
 );
 
 usersRouter.post(
+    '/fs/:fsObjectId/share',
+    ValidateRequest(ValidatorSchemas.shareFsObjectRequestSchema),
+    wrapMiddleware(UsersController.shareFsObject),
+);
+
+usersRouter.post(
+    '/fs/file/:fsObjectId/trash',
+    ValidateRequest(ValidatorSchemas.moveFsObjectToTrashRequestSchema),
+    wrapMiddleware(UsersController.moveFileToTrash),
+);
+
+usersRouter.post(
+    '/fs/folder/:fsObjectId/trash',
+    ValidateRequest(ValidatorSchemas.moveFsObjectToTrashRequestSchema),
+    wrapMiddleware(UsersController.moveFolderToTrash),
+);
+
+usersRouter.post(
+    '/fs/shortcut/:fsObjectId/trash',
+    ValidateRequest(ValidatorSchemas.moveFsObjectToTrashRequestSchema),
+    wrapMiddleware(UsersController.moveShortcutToTrash),
+);
+
+usersRouter.post(
     '/fs/file/:fsObjectId/restore',
-    ValidateRequest(ValidatorSchemas.restoreRequestSchema),
+    ValidateRequest(ValidatorSchemas.restoreFsObjectRequestSchema),
     wrapMiddleware(UsersController.restoreFile),
 );
 
 usersRouter.post(
     '/fs/folder/:fsObjectId/restore',
-    ValidateRequest(ValidatorSchemas.restoreRequestSchema),
+    ValidateRequest(ValidatorSchemas.restoreFsObjectRequestSchema),
     wrapMiddleware(UsersController.restoreFolder),
 );
 
 usersRouter.post(
     '/fs/shortcut/:fsObjectId/restore',
-    ValidateRequest(ValidatorSchemas.restoreRequestSchema),
+    ValidateRequest(ValidatorSchemas.restoreFsObjectRequestSchema),
     wrapMiddleware(UsersController.restoreShortcut),
 );
 
 usersRouter.post(
     '/fs/:fsObjectId/favorite',
-    ValidateRequest(ValidatorSchemas.createFavoriteRequestSchema),
-    wrapMiddleware(UsersController.createFavorite),
+    ValidateRequest(ValidatorSchemas.favoriteFsObjectRequestSchema),
+    wrapMiddleware(UsersController.favoriteFsObject),
 );
 
 usersRouter.post(
@@ -144,24 +174,6 @@ usersRouter.patch(
     wrapMiddleware(UsersController.updateFsObjectPermission),
 );
 
-usersRouter.post(
-    '/fs/file/:fsObjectId/trash',
-    ValidateRequest(ValidatorSchemas.deleteFsObjectRequestSchema),
-    wrapMiddleware(UsersController.moveFileToTrash),
-);
-
-usersRouter.post(
-    '/fs/folder/:fsObjectId/trash',
-    ValidateRequest(ValidatorSchemas.deleteFsObjectRequestSchema),
-    wrapMiddleware(UsersController.moveFolderToTrash),
-);
-
-usersRouter.post(
-    '/fs/shortcut/:fsObjectId/trash',
-    ValidateRequest(ValidatorSchemas.deleteFsObjectRequestSchema),
-    wrapMiddleware(UsersController.moveShortcutToTrash),
-);
-
 usersRouter.delete(
     '/fs/file/:fsObjectId/trash',
     ValidateRequest(ValidatorSchemas.deleteFsObjectRequestSchema),
@@ -188,20 +200,8 @@ usersRouter.delete(
 
 usersRouter.delete(
     '/fs/:fsObjectId/favorite',
-    ValidateRequest(ValidatorSchemas.removeFavoritesRequestSchema),
-    wrapMiddleware(UsersController.removeFavorite),
-);
-
-usersRouter.post(
-    '/fs/:fsObjectId/share/token',
-    ValidateRequest(ValidatorSchemas.generateShareTokenReqSchema),
-    wrapMiddleware(UsersController.generateShareToken),
-);
-
-usersRouter.get(
-    '/fs/:fsObjectId/permission/token',
-    ValidateRequest(ValidatorSchemas.getPermissionByTokenRequestSchema),
-    wrapMiddleware(UsersController.getPermissionByToken),
+    ValidateRequest(ValidatorSchemas.unfavoriteRequestSchema),
+    wrapMiddleware(UsersController.unfavorite),
 );
 
 export default usersRouter;
