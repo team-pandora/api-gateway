@@ -6,10 +6,14 @@ import { ServerError } from './error';
 
 export const fsService = axios.create({
     baseURL: `${config.service.fsCrudUrl}/api`,
+    maxContentLength: 100000000,
+    maxBodyLength: 1000000000
 });
 
 export const storageService = axios.create({
     baseURL: `${config.service.storageServiceUrl}/api/storage`,
+    maxContentLength: 100000000,
+    maxBodyLength: 1000000000
 });
 
 export const kartoffelService = axios.create({
