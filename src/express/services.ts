@@ -4,16 +4,17 @@ import config from '../config';
 import logger from '../utils/logger';
 import { ServerError } from './error';
 
+const { url: storageServiceUrl, ...storageServiceConfig } = config.storageService;
+const { url: fsCrudUrl, ...fsCrudConfig } = config.fsCrud;
+
 export const fsService = axios.create({
-    baseURL: `${config.service.fsCrudUrl}/api`,
-    maxContentLength: 1000000000,
-    maxBodyLength: 10000000000
+    baseURL: `${fsCrudUrl}/api`,
+    ...fsCrudConfig,
 });
 
 export const storageService = axios.create({
-    baseURL: `${config.service.storageServiceUrl}/api/storage`,
-    maxContentLength: 1000000000,
-    maxBodyLength: 10000000000
+    baseURL: `${storageServiceUrl}/api/storage`,
+    ...storageServiceConfig,
 });
 
 export const kartoffelService = axios.create({
