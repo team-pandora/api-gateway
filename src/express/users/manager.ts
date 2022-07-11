@@ -76,6 +76,13 @@ export const getFsObjectHierarchy = async (userId: string, fsObjectId: string) =
     return response.data;
 };
 
+export const getFsObjectSharedUsers = async (userId: string, fsObjectId: string) => {
+    const response = await fsService
+        .get(`/users/${userId}/fs/${fsObjectId}/shared`)
+        .catch(serviceErrorHandler("Failed to get fsObject's shared users"));
+    return response.data;
+};
+
 export const downloadFile = async (userId: string, fileId: string) => {
     const [file] = await getFsObjects(userId, { fsObjectId: fileId, type: 'file' });
     if (!file) throw new ServerError(StatusCodes.NOT_FOUND, 'Failed to get file data');

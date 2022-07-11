@@ -49,6 +49,12 @@ usersRouter.get(
 );
 
 usersRouter.get(
+    '/fs/:fsObjectId/shared',
+    ValidateRequest(ValidatorSchemas.getFsObjectSharedUsersRequestSchema),
+    wrapMiddleware(UsersController.getFsObjectSharedUsers),
+);
+
+usersRouter.get(
     '/fs/file/:fsObjectId/download',
     ValidateRequest(ValidatorSchemas.downloadFileRequestSchema),
     wrapMiddleware(UsersController.downloadFile),
