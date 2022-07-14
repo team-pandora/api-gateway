@@ -45,7 +45,7 @@ export const getFsObjectsRequestSchema = Joi.object({
         size: Joi.number().optional(),
         public: Joi.boolean().optional(),
         name: Joi.string().optional(),
-        parent: Joi.alternatives().try(JoiObjectId, Joi.string().valid('null').empty('null').default(null)).optional(),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.string().valid('null')).optional(),
         type: Joi.string()
             .valid(...fsObjectTypes)
             .optional(),
