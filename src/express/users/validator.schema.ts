@@ -7,8 +7,7 @@ const { fsObjectNameRegex: nameRegex, userIdRegex, minFileSizeInBytes, maxFileSi
 
 export const getUsersRequestSchema = Joi.object({
     query: Joi.object({
-        name: Joi.string().optional(),
-        mail: Joi.string().optional(),
+        query: Joi.string().optional(),
         source: Joi.string().required(),
     })
         .min(1)
@@ -19,9 +18,7 @@ export const getUsersRequestSchema = Joi.object({
 
 export const getUserRequestSchema = Joi.object({
     query: {},
-    params: {
-        userId: Joi.string().regex(userIdRegex).required(),
-    },
+    params: {},
     body: {},
 });
 
@@ -41,7 +38,6 @@ export const getFsObjectsRequestSchema = Joi.object({
         root: Joi.boolean().optional(),
         permission: Joi.alternatives()
             .try(Joi.string().valid(...permissions), Joi.array().items(Joi.string().valid(...permissions)))
-            .custom((value) => (Array.isArray(value) ? { $in: value } : value))
             .optional(),
 
         // FsObject filters
@@ -49,7 +45,7 @@ export const getFsObjectsRequestSchema = Joi.object({
         size: Joi.number().optional(),
         public: Joi.boolean().optional(),
         name: Joi.string().optional(),
-        parent: Joi.alternatives().try(JoiObjectId, Joi.string().valid('null').empty('null').default(null)).optional(),
+        parent: Joi.alternatives().try(JoiObjectId, Joi.string().valid('null')).optional(),
         type: Joi.string()
             .valid(...fsObjectTypes)
             .optional(),
@@ -76,6 +72,14 @@ export const getFsObjectsRequestSchema = Joi.object({
 });
 
 export const getFsObjectRequestSchema = Joi.object({
+    query: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {},
+});
+
+export const getFsObjectSharedUsersRequestSchema = Joi.object({
     query: {},
     params: {
         fsObjectId: JoiObjectId.required(),

@@ -21,19 +21,29 @@ import {
 import { fsService, kartoffelService, serviceErrorHandler, storageService } from '../services';
 
 export const getUsers = async (filters: IUserFilters) => {
-    const { name, mail, source } = filters;
+    const { query, source } = filters;
 
-    const searchUrn = mail
-        ? `/entities/digitalIdentity/${mail}&expanded=true`
-        : `/entities/search?fullName=${name}&digitalIdentity.source=${source}&expanded=true`;
+    const searchByName = kartoffelService.get(
+        `/entities/search?fullName=${encodeURIComponent(query)}&digitalIdentity.source=${source}&expanded=true`,
+    );
+    const searchByUniqueId = kartoffelService.get(
+        `/entities/search?uniqueId=${encodeURIComponent(query)}&digitalIdentity.source=${source}&expanded=true`,
+    );
 
-    const response = await kartoffelService.get(searchUrn).catch(serviceErrorHandler('Failed to get users'));
-    return response.data;
+    const [usersByName, usersByUniqueId]: any[] = await Promise.allSettled([searchByName, searchByUniqueId]);
+
+    if (usersByName.status === 'rejected' && usersByUniqueId.status === 'rejected') {
+        console.log(usersByName.reason, usersByUniqueId.reason);
+
+        throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to get users');
+    }
+
+    return [...(usersByName?.value?.data || {}), ...(usersByUniqueId?.value?.data || {})];
 };
 
 export const getUser = async (userId: string) => {
     const response = await kartoffelService
-        .get(`/entities/${userId}&expanded=true`)
+        .get(`/entities/${userId}?expanded=true`)
         .catch(serviceErrorHandler('Failed to get user'));
     return response.data;
 };
@@ -74,6 +84,28 @@ export const getFsObjectHierarchy = async (userId: string, fsObjectId: string) =
         .get(`/users/${userId}/fs/${fsObjectId}/hierarchy`)
         .catch(serviceErrorHandler('Failed to get fsObject hierarchy'));
     return response.data;
+};
+
+export const getKartoffelUser = async (userId: string) => {
+    const response = await kartoffelService
+        .get(`/entities/${userId}?expanded=true`)
+        .catch(serviceErrorHandler('Failed to get user'));
+    return response.data;
+};
+
+export const getFsObjectSharedUsers = async (userId: string, fsObjectId: string) => {
+    const response = await fsService
+        .get(`/users/${userId}/fs/${fsObjectId}/shared`)
+        .catch(serviceErrorHandler("Failed to get fsObject's shared users"));
+
+    const usersPromises = response.data.map(async (state: any) => ({
+        state,
+        user: await getKartoffelUser(state.userId).catch(() => null),
+    }));
+
+    const users = await Promise.all(usersPromises);
+
+    return users;
 };
 
 export const downloadFile = async (userId: string, fileId: string) => {

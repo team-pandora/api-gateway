@@ -13,7 +13,7 @@ usersRouter.get(
 );
 
 usersRouter.get(
-    '/users/:userId',
+    '/user',
     ValidateRequest(ValidatorSchemas.getUserRequestSchema),
     wrapMiddleware(UsersController.getUser),
 );
@@ -46,6 +46,12 @@ usersRouter.get(
     '/fs/:fsObjectId/hierarchy',
     ValidateRequest(ValidatorSchemas.getFsObjectRequestSchema),
     wrapMiddleware(UsersController.getFsObjectHierarchy),
+);
+
+usersRouter.get(
+    '/fs/:fsObjectId/shared',
+    ValidateRequest(ValidatorSchemas.getFsObjectSharedUsersRequestSchema),
+    wrapMiddleware(UsersController.getFsObjectSharedUsers),
 );
 
 usersRouter.get(

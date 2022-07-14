@@ -3,12 +3,12 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import * as usersManager from './manager';
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request<any, any, any, any>, res: Response) => {
     res.json(await usersManager.getUsers(req.query));
 };
 
 export const getUser = async (req: Request, res: Response) => {
-    res.json(await usersManager.getUser(req.params.userId));
+    res.json(await usersManager.getUser(req.user.id));
 };
 
 export const getQuota = async (req: Request, res: Response) => {
@@ -31,8 +31,14 @@ export const getFsObjectHierarchy = async (req: Request, res: Response) => {
     res.json(await usersManager.getFsObjectHierarchy(req.user.id, req.params.fsObjectId));
 };
 
+export const getFsObjectSharedUsers = async (req: Request, res: Response) => {
+    res.json(await usersManager.getFsObjectSharedUsers(req.user.id, req.params.fsObjectId));
+};
+
 export const downloadFile = async (req: Request, res: Response) => {
+    const file = await usersManager.getFsObject(req.user.id, req.params.fsObjectId);
     const fileStream = await usersManager.downloadFile(req.user.id, req.params.fsObjectId);
+    res.attachment(file.name);
     fileStream.pipe(res);
     await promisify(stream.finished)(fileStream);
 };
