@@ -60,13 +60,6 @@ export interface IGenerateLink {
     permission: string;
 }
 
-export interface IState extends IUserFilters {
-    _id: string;
-    fsObjectId: string;
-    root: string;
-    permission: permission;
-}
-
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters
     stateId?: string;
