@@ -31,10 +31,8 @@ export interface IShortcut extends IFsObject {
 }
 
 export interface IUserFilters {
-    userId?: string;
-    name?: string;
-    mail?: string;
-    source?: string;
+    query: string;
+    source: string;
 }
 
 export interface INewFile {
@@ -62,22 +60,29 @@ export interface IGenerateLink {
     permission: string;
 }
 
+export interface IState extends IUserFilters {
+    _id: string;
+    fsObjectId: string;
+    root: string;
+    permission: permission;
+}
+
 export interface IAggregateStatesAndFsObjectsQuery {
     // State filters
     stateId?: string;
     userId?: string;
-    fsObjectId?: string | { $in: string[] };
+    fsObjectId?: string;
     favorite?: boolean;
     trash?: boolean;
     trashRoot?: boolean;
     root?: boolean;
-    permission?: permission | { $in: Array<permission> } | { $nin: Array<permission> };
+    permission?: permission | permission[];
 
     // FsObject filters
     key?: string;
     bucket?: string;
     client?: string;
-    size?: number | { $gt: number };
+    size?: number;
     public?: boolean;
     name?: string;
     parent?: string;

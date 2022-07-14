@@ -22,11 +22,9 @@ export const kartoffelService = axios.create({
 });
 
 export const serviceErrorHandler = (messagePrefix: string, cleanupFunc?: () => Promise<any>) => async (error: any) => {
-    if (!error?.response?.data) {
-        throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, `${messagePrefix}, internal error`, error);
-    }
-
-    const { code, message } = error.response.data;
+    const responseData = error?.response?.data;
+    const message = `${messagePrefix}, ${responseData?.message || 'internal error'}`;
+    const code = responseData?.code || StatusCodes.INTERNAL_SERVER_ERROR;
 
     if (cleanupFunc) {
         await cleanupFunc().catch((err) => {

@@ -13,7 +13,7 @@ usersRouter.get(
 );
 
 usersRouter.get(
-    '/users/:userId',
+    '/user',
     ValidateRequest(ValidatorSchemas.getUserRequestSchema),
     wrapMiddleware(UsersController.getUser),
 );
