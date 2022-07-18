@@ -23,7 +23,7 @@ export const handleFileUpload = (req: Request, fileHandler: (file: internal.Read
 
         busboy.on('finish', () => {
             if (!fileUpload) reject(new ServerError(StatusCodes.BAD_REQUEST, 'No file provided'));
-            else fileUpload.then(resolve).catch(reject);
+            else fileUpload.then(resolve);
         });
 
         req.pipe(busboy);
