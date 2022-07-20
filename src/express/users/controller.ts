@@ -35,6 +35,10 @@ export const getFsObjectSharedUsers = async (req: Request, res: Response) => {
     res.json(await usersManager.getFsObjectSharedUsers(req.user.id, req.params.fsObjectId));
 };
 
+export const getFsObjectOwner = async (req: Request, res: Response) => {
+    res.json(await usersManager.getFsObjectOwner(req.user.id, req.params.fsObjectId));
+};
+
 export const downloadFile = async (req: Request, res: Response) => {
     const file = await usersManager.getFsObject(req.user.id, req.params.fsObjectId);
     const fileStream = await usersManager.downloadFile(req.user.id, req.params.fsObjectId);

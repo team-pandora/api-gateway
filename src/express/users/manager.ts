@@ -33,8 +33,6 @@ export const getUsers = async (filters: IUserFilters) => {
     const [usersByName, usersByUniqueId]: any[] = await Promise.allSettled([searchByName, searchByUniqueId]);
 
     if (usersByName.status === 'rejected' && usersByUniqueId.status === 'rejected') {
-        console.log(usersByName.reason, usersByUniqueId.reason);
-
         throw new ServerError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to get users');
     }
 
@@ -99,13 +97,25 @@ export const getFsObjectSharedUsers = async (userId: string, fsObjectId: string)
         .catch(serviceErrorHandler("Failed to get fsObject's shared users"));
 
     const usersPromises = response.data.map(async (state: any) => ({
-        state,
+        state: {
+            userId: state.userId,
+            fsObjectId: state.fsObjectId,
+            permission: state.permission,
+        },
         user: await getKartoffelUser(state.userId).catch(() => null),
     }));
 
     const users = await Promise.all(usersPromises);
 
     return users;
+};
+
+export const getFsObjectOwner = async (userId: string, fsObjectId: string) => {
+    const response = await fsService
+        .get(`/users/${userId}/fs/${fsObjectId}/owner`)
+        .catch(serviceErrorHandler("Failed to get fsObject's owner"));
+
+    return getKartoffelUser(response.data.userId);
 };
 
 export const downloadFile = async (userId: string, fileId: string) => {
