@@ -87,6 +87,14 @@ export const getFsObjectSharedUsersRequestSchema = Joi.object({
     body: {},
 });
 
+export const getFsObjectOwnerRequestSchema = Joi.object({
+    query: {},
+    params: {
+        fsObjectId: JoiObjectId.required(),
+    },
+    body: {},
+});
+
 export const downloadFileRequestSchema = Joi.object({
     query: {},
     params: {

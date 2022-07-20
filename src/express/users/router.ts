@@ -55,6 +55,12 @@ usersRouter.get(
 );
 
 usersRouter.get(
+    '/fs/:fsObjectId/owner',
+    ValidateRequest(ValidatorSchemas.getFsObjectOwnerRequestSchema),
+    wrapMiddleware(UsersController.getFsObjectOwner),
+);
+
+usersRouter.get(
     '/fs/file/:fsObjectId/download',
     ValidateRequest(ValidatorSchemas.downloadFileRequestSchema),
     wrapMiddleware(UsersController.downloadFile),
